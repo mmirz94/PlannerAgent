@@ -95,18 +95,7 @@ class PlanAndExecuteAgent:
             self.checkpointer = None
             self.db = None
 
-        # Load knowledge base
-        if kb_path:
-            self.knowledge_base = self._load_knowledge_base(kb_path)
-        else:
-            self.knowledge_base = "No knowledge base provided"
-        # Initialize LLMs for each stage
-        self.planner_llm = self._create_llm(self.planner_provider, self.planner_model)
-        self.replanner_llm = self._create_llm(
-            self.replanner_provider, self.replanner_model
-        )
-        self.agent_llm = self._create_llm(self.agent_provider, self.agent_model)
-
+        # Validate tools early (before expensive LLM creation)
         if tools is not None:
             invalid_tools = [t for t in tools if not isinstance(t, BaseTool)]
             if invalid_tools:
@@ -115,6 +104,19 @@ class PlanAndExecuteAgent:
             tools = []
 
         self.tools = tools
+
+        # Load knowledge base
+        if kb_path:
+            self.knowledge_base = self._load_knowledge_base(kb_path)
+        else:
+            self.knowledge_base = "No knowledge base provided"
+
+        # Initialize LLMs for each stage
+        self.planner_llm = self._create_llm(self.planner_provider, self.planner_model)
+        self.replanner_llm = self._create_llm(
+            self.replanner_provider, self.replanner_model
+        )
+        self.agent_llm = self._create_llm(self.agent_provider, self.agent_model)
 
         # Create dynamic models based on available tools
         self.dynamic_models = create_dynamic_models(self.tools)
@@ -190,9 +192,15 @@ class PlanAndExecuteAgent:
             Configured LLM instance
 
         Raises:
-            ValueError: If model_provider is not supported
+            ValueError: If model_provider is not supported or API credentials missing
         """
         if model_provider == "openai":
+            # Check for required Azure OpenAI environment variables
+            if not os.getenv("AZURE_OPENAI_ENDPOINT"):
+                raise ValueError(
+                    "Azure OpenAI credentials missing. Please set AZURE_OPENAI_ENDPOINT "
+                    "and AZURE_OPENAI_API_KEY environment variables."
+                )
             # Use provided model_name or fall back to environment variable or default
             return AzureChatOpenAI(
                 azure_deployment=model_name,
@@ -201,6 +209,12 @@ class PlanAndExecuteAgent:
                 temperature=0,
             )
         elif model_provider == "anthropic":
+            # Check for required Anthropic API key
+            if not os.getenv("ANTHROPIC_API_KEY"):
+                raise ValueError(
+                    "Anthropic API key missing. Please set ANTHROPIC_API_KEY "
+                    "environment variable."
+                )
             # Use provided model_name or fall back to environment variable or default
             return ChatAnthropic(model=model_name, temperature=0, max_tokens=4000)
         else:

@@ -34,9 +34,7 @@ class TestKnowledgeBaseLoading(unittest.TestCase):
             json.dump({"test_key": "test_value", "nested": {"data": 123}}, f)
 
         # Invalid JSON file
-        self.invalid_kb_path = os.path.join(
-            self.temp_dir, "invalid_kb.json"
-        )
+        self.invalid_kb_path = os.path.join(self.temp_dir, "invalid_kb.json")
         with open(self.invalid_kb_path, "w") as f:
             f.write("{ this is not valid json }")
 
@@ -106,9 +104,7 @@ class TestLLMCreation(unittest.TestCase):
             self.skipTest("Anthropic API key not available")
 
         try:
-            llm = self.agent._create_llm(
-                "anthropic", "claude-sonnet-4-5-20250929"
-            )
+            llm = self.agent._create_llm("anthropic", "claude-sonnet-4-5-20250929")
             self.assertIsNotNone(llm)
         except Exception as e:
             # If credentials are wrong, that's okay - testing the logic
@@ -137,19 +133,14 @@ class TestSaveGraphDiagram(unittest.TestCase):
         """Test that non-png/jpg extension raises ValueError."""
         agent = PlanAndExecuteAgent.__new__(PlanAndExecuteAgent)
         with self.assertRaises(ValueError) as context:
-            agent.save_graph_diagram(
-                os.path.join(self.temp_dir, "test.txt")
-            )
+            agent.save_graph_diagram(os.path.join(self.temp_dir, "test.txt"))
 
         self.assertIn("png or .jpg", str(context.exception))
 
     def test_creates_parent_directories(self):
         """Test that save_graph_diagram creates parent directories."""
         # Skip if API credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-            or os.getenv("ANTHROPIC_API_KEY")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT") or os.getenv("ANTHROPIC_API_KEY")):
             self.skipTest("API credentials not available")
 
         # Create KB file
@@ -178,10 +169,7 @@ class TestSaveGraphDiagram(unittest.TestCase):
             self.assertTrue(os.path.exists(path))
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
 
@@ -208,10 +196,7 @@ class TestToolValidation(unittest.TestCase):
     def test_valid_tools_accepted(self):
         """Test that valid BaseTool instances are accepted."""
         # Skip if API credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-            or os.getenv("ANTHROPIC_API_KEY")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT") or os.getenv("ANTHROPIC_API_KEY")):
             self.skipTest("API credentials not available")
 
         try:
@@ -223,9 +208,7 @@ class TestToolValidation(unittest.TestCase):
                 return f"Results for: {query}"
 
             # create a predefined search tool
-            tavily_search = TavilySearch(
-                max_results=3, topic="finance", include_raw_content=True
-            )
+            tavily_search = TavilySearch(max_results=3, topic="finance", include_raw_content=True)
 
             # Should not raise - valid BaseTool
             agent = PlanAndExecuteAgent(
@@ -239,10 +222,7 @@ class TestToolValidation(unittest.TestCase):
             self.assertEqual(len(agent.tools), 2)
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
     def test_invalid_tool_raises_error(self):
@@ -262,10 +242,7 @@ class TestToolValidation(unittest.TestCase):
     def test_none_tools_uses_empty_list(self):
         """Test that None tools parameter defaults to empty list."""
         # Skip if API credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-            or os.getenv("ANTHROPIC_API_KEY")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT") or os.getenv("ANTHROPIC_API_KEY")):
             self.skipTest("API credentials not available")
 
         try:
@@ -281,19 +258,13 @@ class TestToolValidation(unittest.TestCase):
             self.assertEqual(agent.tools, [])
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
     def test_empty_tools_list_accepted(self):
         """Test that empty tools list is accepted."""
         # Skip if API credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-            or os.getenv("ANTHROPIC_API_KEY")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT") or os.getenv("ANTHROPIC_API_KEY")):
             self.skipTest("API credentials not available")
 
         try:
@@ -309,15 +280,13 @@ class TestToolValidation(unittest.TestCase):
             self.assertEqual(agent.tools, [])
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
 
 class TestAgentInitialization(unittest.TestCase):
     """Test full agent initialization."""
+
     def setUp(self):
         """Create temporary directory."""
         self.temp_dir = tempfile.mkdtemp()
@@ -338,9 +307,7 @@ class TestAgentInitialization(unittest.TestCase):
     def test_minimal_initialization_with_no_tools(self):
         """Test initialization with minimal config and no tools."""
         # Skip if API credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT")):
             self.skipTest("OpenAI API credentials not available")
 
         try:
@@ -366,19 +333,13 @@ class TestAgentInitialization(unittest.TestCase):
             self.assertIsNone(agent.db)
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
     def test_initialization_with_different_providers(self):
         """Test initialization with different model providers."""
         # Skip if credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-            and os.getenv("ANTHROPIC_API_KEY")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT") and os.getenv("ANTHROPIC_API_KEY")):
             self.skipTest("Both API credentials needed for this test")
 
         try:
@@ -400,18 +361,13 @@ class TestAgentInitialization(unittest.TestCase):
             self.assertEqual(agent.agent_provider, "openai")
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
     def test_initialization_without_kb_path(self):
         """Test initialization without knowledge base path."""
         # Skip if API credentials not available
-        if not (
-            os.getenv("AZURE_OPENAI_ENDPOINT")
-        ):
+        if not (os.getenv("AZURE_OPENAI_ENDPOINT")):
             self.skipTest("OpenAI API credentials not available")
 
         try:
@@ -423,20 +379,16 @@ class TestAgentInitialization(unittest.TestCase):
             )
 
             # Should use default message
-            self.assertEqual(
-                agent.knowledge_base, "No knowledge base provided"
-            )
+            self.assertEqual(agent.knowledge_base, "No knowledge base provided")
         except Exception as e:
             # If it's just credential issues, that's okay
-            if (
-                "credential" not in str(e).lower()
-                and "api" not in str(e).lower()
-            ):
+            if "credential" not in str(e).lower() and "api" not in str(e).lower():
                 raise
 
 
 class TestAgentResponse(unittest.TestCase):
     """Test full agent initialization."""
+
     def setUp(self):
         """Create temporary directory."""
         self.temp_dir = tempfile.mkdtemp()
@@ -453,7 +405,7 @@ class TestAgentResponse(unittest.TestCase):
                 for dir in dirs:
                     os.rmdir(os.path.join(root, dir))
             os.rmdir(self.temp_dir)
-   
+
     def test_agent_run(self):
         """Test agent can search and answer: Who won 2025 Tour de France?"""
         # Skip if API credentials not available
@@ -464,9 +416,7 @@ class TestAgentResponse(unittest.TestCase):
             self.skipTest("Tavily API key not available")
 
         # Create a search tool
-        tavily_search = TavilySearch(
-            max_results=3, topic="general", include_raw_content=True
-        )
+        tavily_search = TavilySearch(max_results=3, topic="general", include_raw_content=True)
 
         # Create agent with search capability
         agent = PlanAndExecuteAgent(
@@ -475,16 +425,13 @@ class TestAgentResponse(unittest.TestCase):
             replanner_model="gpt-4o",
             agent_model="gpt-4o",
             tools=[tavily_search],
-            verbose=2
+            verbose=2,
         )
 
         # Execute the async test - pass coroutine directly to asyncio.run
         try:
             result = asyncio.run(
-                agent.run(
-                    user_input="Who won the 2025 Tour de France?",
-                    user_id="test_user_id"
-                )
+                agent.run(user_input="Who won the 2025 Tour de France?", user_id="test_user_id")
             )
 
             # Check that we got a response
@@ -494,19 +441,14 @@ class TestAgentResponse(unittest.TestCase):
             # Check if "Tadej" is in the response (case-insensitive)
             response_text = result.response.lower()
             self.assertIn(
-                "tadej",
-                response_text,
-                f"Expected 'Tadej' in response, got: {result.response}"
+                "tadej", response_text, f"Expected 'Tadej' in response, got: {result.response}"
             )
 
             print(f"\n✓ Agent Response: {result.response}\n")
 
         except Exception as e:
             # If credentials or API issues, skip the test
-            if any(
-                word in str(e).lower()
-                for word in ["credential", "api", "key", "auth"]
-            ):
+            if any(word in str(e).lower() for word in ["credential", "api", "key", "auth"]):
                 self.skipTest(f"API/credential issue: {e}")
             else:
                 raise
@@ -521,9 +463,7 @@ class TestAgentResponse(unittest.TestCase):
             self.skipTest("Tavily API key not available")
 
         # Create a search tool
-        tavily_search = TavilySearch(
-            max_results=3, topic="general", include_raw_content=True
-        )
+        tavily_search = TavilySearch(max_results=3, topic="general", include_raw_content=True)
 
         # Create agent with search capability
         agent = PlanAndExecuteAgent(
@@ -540,7 +480,7 @@ class TestAgentResponse(unittest.TestCase):
             async for event in agent.stream(
                 user_input="Who won the 2025 Tour de France?",
                 user_id="test_user",
-                stream_mode="updates"
+                stream_mode="updates",
             ):
                 events.append(event)
 
@@ -551,9 +491,7 @@ class TestAgentResponse(unittest.TestCase):
             events = asyncio.run(stream_query())
 
             # Check that we got events
-            self.assertGreater(
-                len(events), 0, "Expected streaming events, got none"
-            )
+            self.assertGreater(len(events), 0, "Expected streaming events, got none")
 
             # Find the final response in the last event
             final_event = events[-1]
@@ -568,9 +506,7 @@ class TestAgentResponse(unittest.TestCase):
             if response:
                 response_text = response.lower()
                 self.assertIn(
-                    "tadej",
-                    response_text,
-                    f"Expected 'Tadej' in response, got: {response}"
+                    "tadej", response_text, f"Expected 'Tadej' in response, got: {response}"
                 )
                 print(f"\n✓ Streaming Response: {response}\n")
             else:
@@ -578,10 +514,7 @@ class TestAgentResponse(unittest.TestCase):
 
         except Exception as e:
             # If credentials or API issues, skip the test
-            if any(
-                word in str(e).lower()
-                for word in ["credential", "api", "key", "auth"]
-            ):
+            if any(word in str(e).lower() for word in ["credential", "api", "key", "auth"]):
                 self.skipTest(f"API/credential issue: {e}")
             else:
                 raise
@@ -591,14 +524,8 @@ if __name__ == "__main__":
     # Print environment info
     print("\n" + "=" * 70)
     print("Test Environment:")
-    print(
-        f"  Azure OpenAI: "
-        f"{'✓' if os.getenv('AZURE_OPENAI_ENDPOINT') else '✗'}"
-    )
-    print(
-        f"  Anthropic API: "
-        f"{'✓' if os.getenv('ANTHROPIC_API_KEY') else '✗'}"
-    )
+    print(f"  Azure OpenAI: " f"{'✓' if os.getenv('AZURE_OPENAI_ENDPOINT') else '✗'}")
+    print(f"  Anthropic API: " f"{'✓' if os.getenv('ANTHROPIC_API_KEY') else '✗'}")
     print(f"  MongoDB: {'✓' if os.getenv('MONGODB_URI') else '✗'}")
     print("=" * 70 + "\n")
 
