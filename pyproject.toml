@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PlannerAgent"
+version = "0.1.0"
+description = "Flexible LangGraph Plan-and-Execute Agent with customizable knowledge bases, prompts, and tools"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Salar Mirzaloo", email = "sal.mirzaloo@gmail.com"}
+]
+keywords = ["langgraph", "agent", "llm", "ai", "langchain", "plan-execute"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+   "langgraph",
+   "langgraph-cli",
+    "langgraph-checkpoint-mongodb",
+    "langchain-community",
+    "langchain-core",
+    "langchain-tavily",
+    "langchain-anthropic",
+    "langchain-openai",
+    "pydantic",
+    "motor",
+    "pymongo",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+
+[project.urls]
+"Source Code" = "https://github.com/mmirz94/PlannerAgent"
+"Bug Tracker" = "https://github.com/mmirz94/PlannerAgent/issues"
+
+[tool.setuptools.packages.find]
+include = ["PlannerAgent*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+PlannerAgent = ["py.typed"]  # Include type hints marker if using mypy
+
+[tool.setuptools.exclude-package-data]
+"*" = ["__pycache__", "*.pyc", "*.pyo", "*.orig", "*.rej", ".git*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
