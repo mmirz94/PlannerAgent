@@ -59,15 +59,15 @@ class PlanAndExecuteAgent:
             verbose: Logging level (0=no logging, 1=states only, 2=states+token usage)
 
         Example:
-            >>> # Use powerful Claude for planning, fast GPT for execution
-            >>> agent = PlanAndExecuteAgent(
-            ...     planner_model="claude-sonnet-4-5-20250929",
-            ...     planner_provider="anthropic",
-            ...     replanner_model="claude-sonnet-4-5-20250929",
-            ...     replanner_provider="anthropic",
-            ...     agent_model="gpt-4o-mini",
-            ...     agent_provider="openai"
-            ... )
+            agent = PlanAndExecuteAgent(
+                planner_model="claude-sonnet-4-5-20250929",
+                planner_provider="anthropic",
+                replanner_model="claude-sonnet-4-5-20250929",
+                replanner_provider="anthropic",
+                agent_model="gpt-4o-mini",
+                agent_provider="openai",
+                tools=[]
+            )
         """
         # Store model configurations
         self.planner_provider = planner_provider
@@ -113,9 +113,7 @@ class PlanAndExecuteAgent:
 
         # Initialize LLMs for each stage
         self.planner_llm = self._create_llm(self.planner_provider, self.planner_model)
-        self.replanner_llm = self._create_llm(
-            self.replanner_provider, self.replanner_model
-        )
+        self.replanner_llm = self._create_llm(self.replanner_provider, self.replanner_model)
         self.agent_llm = self._create_llm(self.agent_provider, self.agent_model)
 
         # Create dynamic models based on available tools
@@ -160,15 +158,13 @@ class PlanAndExecuteAgent:
             json.JSONDecodeError: If knowledge base file contains invalid JSON
             PermissionError: If lacking permissions to read the file
         """
- 
+
         try:
             with open(knowledge_base_path, "r") as f:
                 kb = json.load(f)
             return json.dumps(kb, indent=2)
         except FileNotFoundError:
-            raise FileNotFoundError(
-                f"Knowledge base file not found at: {knowledge_base_path}"
-            )
+            raise FileNotFoundError(f"Knowledge base file not found at: {knowledge_base_path}")
         except json.JSONDecodeError as e:
             raise json.JSONDecodeError(
                 f"Invalid JSON in knowledge base file: {knowledge_base_path}",
@@ -231,9 +227,7 @@ class PlanAndExecuteAgent:
         """
         # Create dynamic system prompt based on available tools
         system_prompt = create_react_agent_system_prompt(self.tools)
-        return create_agent(
-            self.agent_llm, self.tools, system_prompt=system_prompt
-        )
+        return create_agent(self.agent_llm, self.tools, system_prompt=system_prompt)
 
     def _build_graph(self) -> StateGraph:
         """
@@ -243,9 +237,7 @@ class PlanAndExecuteAgent:
             Compiled StateGraph
         """
         # Initialize the graph with states
-        builder = StateGraph(
-            PlanExecuteState, input_schema=InputState, output_schema=OutputState
-        )
+        builder = StateGraph(PlanExecuteState, input_schema=InputState, output_schema=OutputState)
 
         # Add nodes - using instance methods
         builder.add_node("summarize_conversation", self.nodes.summarize_conversation)
@@ -335,9 +327,7 @@ class PlanAndExecuteAgent:
         """
 
         if not (save_path.endswith(".png") or save_path.endswith(".jpg")):
-            raise ValueError(
-                "Save path must be a valid file path with " ".png or .jpg extension"
-            )
+            raise ValueError("Save path must be a valid file path with " ".png or .jpg extension")
 
         # Create parent directories if they don't exist
         directory = os.path.dirname(save_path)
@@ -345,4 +335,4 @@ class PlanAndExecuteAgent:
             os.makedirs(directory, exist_ok=True)
 
         with open(save_path, "wb") as f:
-            f.write(self.graph.get_graph(xray=3).draw_mermaid_png())
+            f.write(self.graph.get_graph(xray=True).draw_mermaid_png())
